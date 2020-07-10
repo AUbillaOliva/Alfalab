@@ -1,11 +1,7 @@
 const express = require('express');
 const app = express();
-const config = require('config');
 
 const connectDB  = require('./config/db.js');
-
-//let connection = connectDB();
-//autoIncrement.initialize(connection);
 
 connectDB();
 
