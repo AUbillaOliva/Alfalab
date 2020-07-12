@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const { check, validationResult } = require('express-validator');
 const autoincrement = require('mongoose-auto-increment');
 const OrderSchema = require('../../modules/Orders');
 
-const Order = require('../../modules/Orders');
+const Order = mongoose.model('order', OrderSchema);
 
 router.get('/', async (req, res) => {
   try {
@@ -57,7 +58,6 @@ router.post('/:id?',
     if(responsible) { orderFields.responsible = responsible; }
 
     try {
-      Order = mongoose.model('order', OrderSchema);
       if(req.params.id){
         let order = await Order.findOne({number: req.params.id});
         if(order) {
