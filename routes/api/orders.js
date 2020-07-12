@@ -1,11 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 const { check, validationResult } = require('express-validator');
-const autoincrement = require('mongoose-auto-increment');
-const OrderSchema = require('../../modules/Orders');
-
-const Order = mongoose.model('order', OrderSchema);
+const Order = require('../../modules/Orders');
 
 router.get('/', async (req, res) => {
   try {
@@ -22,11 +18,13 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/:id?', 
+router.post('/', 
   [
     [
       check('responsible').not().isEmpty(),
-      check('checkin').not().isEmpty()
+      check('checkin').not().isEmpty(),
+      check('client.firstname').not().isEmpty(),
+      check('client.lastname').not().isEmpty()
     ]
   ], async (req, res) => {
     const errors = validationResult(req);
@@ -35,7 +33,6 @@ router.post('/:id?',
     }
 
     const {
-      number,
       commentaries,
       responsible,
       checkin,
@@ -46,35 +43,31 @@ router.post('/:id?',
       client
     } = req.body;
 
-    const orderFields = {};
-    if(number){ orderFields.number = number; }
-    if(commentaries){ orderFields.commentaries = commentaries.split(',').map(commentary => commentary.trim()); }
+    const orderFields = {};    
+    if(commentaries){ orderFields.commentaries = commentaries }
     if(checkin){ orderFields.checkin = checkin; }
     if(checkout) { orderFields.checkout = checkout; }
     if(orderType) { orderFields.orderType = orderType; }
     if(status) { orderFields.status = status; }
     if(price) { orderFields.price = price; }
     if(client) { orderFields.client = client; }
-    if(responsible) { orderFields.responsible = responsible; }
-
+    if(responsible) { orderFields.responsible = responsible; } 
+    
     try {
-      if(req.params.id){
-        let order = await Order.findOne({number: req.params.id});
-        if(order) {
-          order = await Order.findOneAndUpdate({
-            $set: orderFields,
-            new: false
-          });
-          console.log(`Order ${order._id} updated`);
-          return res.json(order);
-        }
+      let order = await Order.findOne(orderFields);
+      if(order) {
+        order = await Order.findOneAndUpdate({
+          $set: orderFields,
+          new: true
+        });
+        console.log(`Order ${order._id} updated`);
+        res.send(order).status(200);
       } else {
         order = new Order(orderFields);
         await order.save();
         console.log(`Order ${order._id} created`);
-        res.json(order);
+        res.send(order).status(200);
       }
-      
     } catch(err){
       console.error(err);
       res.status(500).send('server error');
