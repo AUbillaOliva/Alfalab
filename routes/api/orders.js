@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
+const autoincrement = require('mongoose-auto-increment');
+const OrderSchema = require('../../modules/Orders');
 
 const Order = require('../../modules/Orders');
 
@@ -19,14 +21,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', 
+router.post('/:id?', 
   [
     [
-      //check('id').not().isEmpty(),
-      //check('number').not().isEmpty(),
-      //check('responsible').not().isEmpty(),
-      //check('checkin').not().isEmpty()
-      //check('client_id').not().isEmpty();
+      check('responsible').not().isEmpty(),
+      check('checkin').not().isEmpty()
     ]
   ], async (req, res) => {
     const errors = validationResult(req);
@@ -40,7 +39,7 @@ router.post('/',
       responsible,
       checkin,
       checkout,
-      type,
+      orderType,
       status,
       price,
       client
@@ -51,21 +50,28 @@ router.post('/',
     if(commentaries){ orderFields.commentaries = commentaries.split(',').map(commentary => commentary.trim()); }
     if(checkin){ orderFields.checkin = checkin; }
     if(checkout) { orderFields.checkout = checkout; }
-    if(type) { orderFields.status = status; }
+    if(orderType) { orderFields.orderType = orderType; }
+    if(status) { orderFields.status = status; }
     if(price) { orderFields.price = price; }
     if(client) { orderFields.client = client; }
+    if(responsible) { orderFields.responsible = responsible; }
 
     try {
-      let order = await Order.findById(req.params.id);
-      if(order) {
-        order = await Order.findOneAndUpdate({
-          $set: orderFields,
-          new: true
-        });
-        return res.json(order);
+      Order = mongoose.model('order', OrderSchema);
+      if(req.params.id){
+        let order = await Order.findOne({number: req.params.id});
+        if(order) {
+          order = await Order.findOneAndUpdate({
+            $set: orderFields,
+            new: false
+          });
+          console.log(`Order ${order._id} updated`);
+          return res.json(order);
+        }
       } else {
         order = new Order(orderFields);
         await order.save();
+        console.log(`Order ${order._id} created`);
         res.json(order);
       }
       
@@ -73,6 +79,22 @@ router.post('/',
       console.error(err);
       res.status(500).send('server error');
     }
+});
+
+router.delete('/:number', async (req, res) => {
+  try {
+    let order = await Order.findOne({ number: req.params.number });
+    console.log(order);
+    if(order){
+      await Order.findOneAndRemove({id: order._id});
+      console.log('Order deleted');
+      res.send(`Order ${order._id} deleted`).status(200);
+    } else {
+      res.send('Order not found').status(404);
+    }
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 module.exports = router;
