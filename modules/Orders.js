@@ -6,22 +6,27 @@ const OrderSchema = new mongoose.Schema({
     type: Number,
     unique: true,
     ref: 'number',
-    default: 0
+    lowercase: true
   },
   commentaries: {
-    type: [String]
+    type: String,
+    lowercase: true
   },
   responsible: {
-    type: String
+    type: String,
+    lowercase: true
   },
   checkin: {
-    type: String
+    type: String,
+    lowercase: true
   },
   checkout: {
-    type: String
+    type: String,
+    lowercase: true
   },
   orderType: {
-    type: String
+    type: String,
+    lowercase: true
   },
   status: {
     type: Boolean
@@ -35,4 +40,6 @@ const OrderSchema = new mongoose.Schema({
   }
 });
 
-module.exports = OrderSchema;
+OrderSchema.plugin(autoincrement.plugin, { model: 'orders', field: 'number', startAt: 0, incrementBy: 1 });
+const Order = mongoose.model('orders', OrderSchema);
+module.exports = Order;
