@@ -1,25 +1,26 @@
 const mongoose = require('mongoose');
-//const autoincrement = require('mongoose-auto-increment');
+const autoincrement = require('mongoose-auto-increment');
 
 const OrderSchema = new mongoose.Schema({
   number : {
     type: Number,
-    //required: true,
     unique: true,
-    ref: 'OrderNumber'
+    ref: 'number',
+    default: 0
+  },
+  commentaries: {
+    type: [String]
   },
   responsible: {
-    type: String,
-    //required: true
+    type: String
   },
   checkin: {
     type: String
-    //required: true
   },
   checkout: {
     type: String
   },
-  type: {
+  orderType: {
     type: String
   },
   status: {
@@ -34,5 +35,4 @@ const OrderSchema = new mongoose.Schema({
   }
 });
 
-//OrderSchema.plugin(autoincrement.plugin, 'OrderNumber');
-module.exports = Order = mongoose.model('orders', OrderSchema);
+module.exports = OrderSchema;
