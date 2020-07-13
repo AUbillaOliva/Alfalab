@@ -4,7 +4,7 @@
   "description": "Alfalab api",
   "main": "index.js",
   "scripts": {
-    "start": "node index",
+    "start": "nodemon index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,7 +23,8 @@
     "express": "^4.17.1",
     "express-validator": "^6.6.0",
     "mongoose": "^5.9.22",
-    "mongoose-auto-increment": "^5.0.1"
+    "mongoose-auto-increment": "^5.0.1",
+    "newrelic": "^6.11.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
