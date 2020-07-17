@@ -2,16 +2,16 @@ const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const OrderSchema = require('../../modules/Orders');
-const mongoose = require('mongoose');
 const autoincrement = require('mongoose-auto-increment');
-
-
+const mongoose = require('mongoose');
 OrderSchema.plugin(autoincrement.plugin, { model: 'orders', field: 'number', startAt: 0, incrementBy: 1 });
 const Order = mongoose.model('orders', OrderSchema);
 
+const Delivered = mongoose.model('delivered', OrderSchema);
+
 router.get('/', async (req, res) => {
   try {
-    const data = await Order.find().populate('data');
+    const data = await Delivered.find().populate('data');
     if(!data){
       res.status(404).send({
         msg: 'There is not orders'
@@ -29,6 +29,7 @@ router.post('/',
     [
       check('responsible').not().isEmpty(),
       check('checkin').not().isEmpty(),
+      //check('checkout').not().isEmpty(),
       check('client.firstname').not().isEmpty(),
       check('client.lastname').not().isEmpty()
     ]
@@ -49,30 +50,30 @@ router.post('/',
       client
     } = req.body;
 
-    const orderFields = {};    
-    if(commentaries){ orderFields.commentaries = commentaries }
-    if(checkin){ orderFields.checkin = checkin; }
-    if(checkout) { orderFields.checkout = checkout; }
-    if(orderType) { orderFields.orderType = orderType; }
-    if(status) { orderFields.status = status; }
-    if(price) { orderFields.price = price; }
-    if(client) { orderFields.client = client; }
-    if(responsible) { orderFields.responsible = responsible; } 
+    const deliveryFields = {};    
+    if(commentaries){ deliveryFields.commentaries = commentaries }
+    if(checkin){ deliveryFields.checkin = checkin; }
+    if(checkout) { deliveryFields.checkout = checkout; }
+    if(orderType) { deliveryFields.orderType = orderType; }
+    if(status) { deliveryFields.status = status; }
+    if(price) { deliveryFields.price = price; }
+    if(client) { deliveryFields.client = client; }
+    if(responsible) { deliveryFields.responsible = responsible; } 
     
     try {
-      let order = await Order.findOne(orderFields);
-      if(order) {
-        order = await Order.findOneAndUpdate({
-          $set: orderFields,
+      let delivery = await Delivered.findOne(deliveryFields);
+      if(delivery) {
+        delivery = await Delivered.findOneAndUpdate({
+          $set: deliveryFields,
           new: true
         });
-        console.log(`Order ${order._id} updated`);
-        res.send(order).status(200);
+        console.log(`Delivery ${delivery._id} updated`);
+        res.send(delivery).status(200);
       } else {
-        order = new Order(orderFields);
-        await order.save();
-        console.log(`Order ${order._id} created`);
-        res.send(order).status(200);
+        delivery = new Delivered(deliveryFields);
+        await delivery.save();
+        console.log(`Delivery ${delivery._id} created`);
+        res.send(delivery).status(200);
       }
     } catch(err){
       console.error(err);

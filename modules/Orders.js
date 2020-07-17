@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const autoincrement = require('mongoose-auto-increment');
 
 const OrderSchema = new mongoose.Schema({
   number : {
@@ -40,6 +39,4 @@ const OrderSchema = new mongoose.Schema({
   }
 });
 
-OrderSchema.plugin(autoincrement.plugin, { model: 'orders', field: 'number', startAt: 0, incrementBy: 1 });
-const Order = mongoose.model('orders', OrderSchema);
-module.exports = Order;
+module.exports = OrderSchema;
