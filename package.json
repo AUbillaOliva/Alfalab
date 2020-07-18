@@ -23,7 +23,8 @@
     "express": "^4.17.1",
     "express-validator": "^6.6.0",
     "mongoose": "^5.9.22",
-    "mongoose-auto-increment": "^5.0.1"
+    "mongoose-auto-increment": "^5.0.1",
+    "newrelic": "^6.11.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"

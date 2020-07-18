@@ -1,27 +1,31 @@
 const mongoose = require('mongoose');
-const autoincrement = require('mongoose-auto-increment');
 
 const OrderSchema = new mongoose.Schema({
   number : {
     type: Number,
     unique: true,
     ref: 'number',
-    default: 0
+    lowercase: true
   },
   commentaries: {
-    type: [String]
+    type: String,
+    lowercase: true
   },
   responsible: {
-    type: String
+    type: String,
+    lowercase: true
   },
   checkin: {
-    type: String
+    type: String,
+    lowercase: true
   },
   checkout: {
-    type: String
+    type: String,
+    lowercase: true
   },
   orderType: {
-    type: String
+    type: String,
+    lowercase: true
   },
   status: {
     type: Boolean

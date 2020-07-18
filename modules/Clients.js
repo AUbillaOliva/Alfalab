@@ -3,17 +3,21 @@ const mongoose = require('mongoose');
 const ClientSchema = new mongoose.Schema({
   firstname: {
     type: String,
-    required: true
+    required: true,
+    lowercase: true
   },
   lastname: {
     type: String,
-    required: true
+    required: true,
+    lowercase: true
   },
   instagram: {
-    type: String
+    type: String,
+    lowercase: true
   },
   email: {
-    type: String
+    type: String,
+    lowercase: true
   }
 });
 
