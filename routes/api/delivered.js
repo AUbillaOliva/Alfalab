@@ -29,7 +29,7 @@ router.post('/',
     [
       check('responsible').not().isEmpty(),
       check('checkin').not().isEmpty(),
-      //check('checkout').not().isEmpty(),
+      check('checkout').not().isEmpty(),
       check('client.firstname').not().isEmpty(),
       check('client.lastname').not().isEmpty()
     ]
@@ -83,17 +83,17 @@ router.post('/',
 
 router.delete('/:number', async (req, res) => {
   try {
-    let order = await Order.findOne({ number: req.params.number });
-    console.log(order);
-    if(order){
-      await Order.findByIdAndRemove(order._id);
-      console.log(`Order ${order._id} deleted`);
-      res.send(`Order ${order._id} deleted`).status(200);
+    let delivery = await Delivered.findOne({ number: req.params.number });
+    if(delivery){
+      await Delivered.findByIdAndRemove(delivery._id);
+      console.log(`Delivery ${delivery._id} deleted`);
+      res.send(`Delivery ${delivery._id} deleted`).status(200);
     } else {
       res.send('Order not found').status(404);
     }
   } catch (err) {
     console.error(err);
+    res.send('Server Error').status(500);
   }
 });
 
