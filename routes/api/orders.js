@@ -30,7 +30,8 @@ router.post('/:number?',
       check('responsible').not().isEmpty(),
       check('checkin').not().isEmpty(),
       check('client.firstname').not().isEmpty(),
-      check('client.lastname').not().isEmpty()
+      check('client.lastname').not().isEmpty(),
+      check('quantity').not().isEmpty()
     ]
   ], async (req, res) => {
     const errors = validationResult(req);
@@ -46,7 +47,8 @@ router.post('/:number?',
       orderType,
       status,
       price,
-      client
+      client,
+      quantity
     } = req.body;
 
     const orderFields = {};    
@@ -58,6 +60,7 @@ router.post('/:number?',
     if(price) { orderFields.price = price; }
     if(client) { orderFields.client = client; }
     if(responsible) { orderFields.responsible = responsible; } 
+    if(quantity) { orderFields.quantity = quantity; }
     
     try {
       let order = await Order.findOne({number: req.params.number});

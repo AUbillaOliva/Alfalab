@@ -36,6 +36,10 @@ const OrderSchema = new mongoose.Schema({
   client: {
     type: mongoose.Schema.Types.Object,
     ref: 'client'
+  },
+  quantity: {
+    type: Number,
+    required: true
   }
 });
 

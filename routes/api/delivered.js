@@ -5,7 +5,6 @@ const OrderSchema = require('../../modules/Orders');
 const autoincrement = require('mongoose-auto-increment');
 const mongoose = require('mongoose');
 OrderSchema.plugin(autoincrement.plugin, { model: 'orders', field: 'number', startAt: 0, incrementBy: 1 });
-const Order = mongoose.model('orders', OrderSchema);
 
 const Delivered = mongoose.model('delivered', OrderSchema);
 
@@ -31,7 +30,8 @@ router.post('/',
       check('checkin').not().isEmpty(),
       check('checkout').not().isEmpty(),
       check('client.firstname').not().isEmpty(),
-      check('client.lastname').not().isEmpty()
+      check('client.lastname').not().isEmpty(),
+      check('quantity').not().isEmpty()
     ]
   ], async (req, res) => {
     const errors = validationResult(req);
@@ -47,7 +47,8 @@ router.post('/',
       orderType,
       status,
       price,
-      client
+      client,
+      quantity
     } = req.body;
 
     const deliveryFields = {};    
@@ -59,6 +60,7 @@ router.post('/',
     if(price) { deliveryFields.price = price; }
     if(client) { deliveryFields.client = client; }
     if(responsible) { deliveryFields.responsible = responsible; } 
+    if(quantity) { deliveryFields.quantity = quantity; }
     
     try {
       let delivery = await Delivered.findOne(deliveryFields);
