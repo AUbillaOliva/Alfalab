@@ -4,7 +4,7 @@
   "description": "Alfalab api",
   "main": "index.js",
   "scripts": {
-    "start": "node index",
+    "start": "nodemon -L index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,12 +19,13 @@
   "homepage": "https://github.com/AUbillaOliva/Alfalab#readme",
   "dependencies": {
     "axios": "^0.19.2",
-    "config": "^3.3.1",
     "express": "^4.17.1",
     "express-validator": "^6.6.0",
     "mongoose": "^5.9.22",
     "mongoose-auto-increment": "^5.0.1",
-    "newrelic": "^6.11.0"
+    "multer": "^1.4.2",
+    "newrelic": "^6.11.0",
+    "nodemailer": "^6.4.11"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
