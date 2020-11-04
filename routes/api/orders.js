@@ -67,7 +67,7 @@ router.post('/:number?',
           $set: ordersFields,
           new: false
         });
-        console.log(`Orders ${order._id} updated`);
+        console.log(`Orders ${orders._id} updated`);
         res.send(order).status(200);
       } else {
         orders = new Orders(ordersFields);
