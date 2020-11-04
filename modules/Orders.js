@@ -3,7 +3,7 @@ const ClientSchema = require('./Clients');
 const OrderSchema = require('./Order');
 
 const OrdersSchema = new mongoose.Schema({
-    order: {
+    orderList: {
         type: [OrderSchema],
         required: true
     },

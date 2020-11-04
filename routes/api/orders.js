@@ -27,7 +27,11 @@ router.get('/', async (req, res) => {
 router.post('/:number?', 
   [
     [
+<<<<<<< HEAD
+      check('orderList').not().isEmpty(),
+=======
       check('orders').not().isEmpty(),
+>>>>>>> a2b29922c1794b6ae2528347ae9745d733f3db4a
       check('client.firstname').not().isEmpty(),
       check('client.lastname').not().isEmpty(),
       check('created_at').not().isEmpty(),
@@ -36,12 +40,15 @@ router.post('/:number?',
   ], async (req, res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-      process.stdout.write('\033c');
       return res.status(400).json({errors: errors.array()});
     }
 
     const {
+<<<<<<< HEAD
+      orderList,
+=======
       orders,
+>>>>>>> a2b29922c1794b6ae2528347ae9745d733f3db4a
       client,
       zone,
       delivered_by,
@@ -52,7 +59,11 @@ router.post('/:number?',
     } = req.body;
 
     const ordersFields = {};    
+<<<<<<< HEAD
+    if(orderList) { ordersFields.orderList = orderList; }
+=======
     if(orders) { ordersFields.orders = orders; }
+>>>>>>> a2b29922c1794b6ae2528347ae9745d733f3db4a
     if(client) { ordersFields.client = client; }
     if(zone) { ordersFields.zone = zone; }
     if(delivered_by) { ordersFields.delivered_by = delivered_by; }
@@ -62,22 +73,33 @@ router.post('/:number?',
     if(status != null || status != undefined) { ordersFields.status = status; }
     
     try {
+<<<<<<< HEAD
+      let orders = await Orders.findOne({orders_number: req.params.number});
+      if(orders) {
+        orders = await Orders.findOneAndUpdate({orders_number: req.params.number},{
+=======
       let order = await Orders.findOne({orders_number: req.params.number});
       if(order) {
         order = await Orders.findOneAndUpdate({
+>>>>>>> a2b29922c1794b6ae2528347ae9745d733f3db4a
           $set: ordersFields,
-          new: true
+          new: false
         });
         console.log(`Orders ${order._id} updated`);
         res.send(order).status(200);
       } else {
+<<<<<<< HEAD
+        orders = new Orders(ordersFields);
+        await orders.save();
+        res.send(orders).status(200);
+=======
         order = new Orders(ordersFields);
         await order.save();
         console.log(`Orders ${order._id} created`);
         res.send(order).status(200);
+>>>>>>> a2b29922c1794b6ae2528347ae9745d733f3db4a
       }
     } catch(err){
-      process.stdout.write('\033c');
       console.error(err);
       res.status(500).send('server error');
     }

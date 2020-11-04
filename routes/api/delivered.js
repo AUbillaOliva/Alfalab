@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 router.post('/:number?', 
 [
   [
-    check('order').not().isEmpty(),
+    check('orderList').not().isEmpty(),
     check('client.firstname').not().isEmpty(),
     check('client.lastname').not().isEmpty(),
     check('created_at').not().isEmpty(),
@@ -34,24 +34,23 @@ router.post('/:number?',
 ], async (req, res) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()){
-    process.stdout.write('\033c');
     return res.status(400).json({errors: errors.array()});
   }
 
   const {
-    order,
+    orderList,
     client,
-    orders_number,
     zone,
     delivered_by,
     created_at,
     delivered_date,
     total,
-    status
+    status,
+    orders_number
   } = req.body;
 
   const deliveryFields = {};    
-  if(order) { deliveryFields.order = order; }
+  if(orderList) { deliveryFields.orderList = orderList; }
   if(client) { deliveryFields.client = client; }
   if(zone) { deliveryFields.zone = zone; }
   if(delivered_by) { deliveryFields.delivered_by = delivered_by; }
@@ -64,9 +63,9 @@ router.post('/:number?',
   try {
     let delivery = await Delivered.findOne({orders_number: req.params.number});
     if(delivery) {
-      delivery = await Delivered.findOneAndUpdate({
+      delivery = await Delivered.findOneAndUpdate({orders_number: req.params.number},{
         $set: deliveryFields,
-        new: true
+        new: false
       });
       console.log(`Delivery ${delivery._id} updated`);
       res.send(delivery).status(200);
@@ -77,7 +76,6 @@ router.post('/:number?',
       res.send(delivery).status(200);
     }
   } catch(err){
-    process.stdout.write('\033c');
     console.error(err);
     res.status(500).send('server error');
   }
