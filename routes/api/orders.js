@@ -4,6 +4,7 @@ const { check, validationResult } = require('express-validator');
 const OrdersSchema = require('../../modules/Orders');
 const mongoose = require('mongoose');
 const autoincrement = require('mongoose-auto-increment');
+
 OrdersSchema.plugin(autoincrement.plugin, { model: 'orders', field: 'orders_number', startAt: 0, incrementBy: 1 });
 const Orders = mongoose.model('orders', OrdersSchema);
 
@@ -26,7 +27,7 @@ router.get('/', async (req, res) => {
 router.post('/:number?', 
   [
     [
-      check('order').not().isEmpty(),
+      check('orders').not().isEmpty(),
       check('client.firstname').not().isEmpty(),
       check('client.lastname').not().isEmpty(),
       check('created_at').not().isEmpty(),
@@ -40,7 +41,7 @@ router.post('/:number?',
     }
 
     const {
-      order,
+      orders,
       client,
       zone,
       delivered_by,
@@ -51,7 +52,7 @@ router.post('/:number?',
     } = req.body;
 
     const ordersFields = {};    
-    if(order) { ordersFields.order = order; }
+    if(orders) { ordersFields.orders = orders; }
     if(client) { ordersFields.client = client; }
     if(zone) { ordersFields.zone = zone; }
     if(delivered_by) { ordersFields.delivered_by = delivered_by; }
@@ -61,19 +62,19 @@ router.post('/:number?',
     if(status != null || status != undefined) { ordersFields.status = status; }
     
     try {
-      let orders = await Orders.findOne({orders_number: req.params.number});
-      if(orders) {
-        orders = await Orders.findOneAndUpdate({
+      let order = await Orders.findOne({orders_number: req.params.number});
+      if(order) {
+        order = await Orders.findOneAndUpdate({
           $set: ordersFields,
           new: true
         });
-        console.log(`Orders ${orders._id} updated`);
-        res.send(orders).status(200);
+        console.log(`Orders ${order._id} updated`);
+        res.send(order).status(200);
       } else {
-        orders = new Orders(ordersFields);
-        await orders.save();
-        console.log(`Orders ${orders._id} created`);
-        res.send(orders).status(200);
+        order = new Orders(ordersFields);
+        await order.save();
+        console.log(`Orders ${order._id} created`);
+        res.send(order).status(200);
       }
     } catch(err){
       process.stdout.write('\033c');
