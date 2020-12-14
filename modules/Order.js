@@ -3,7 +3,8 @@ const UserSchema = require('./User');
 
 const OrderSchema = new mongoose.Schema({
   responsible: {
-    type: UserSchema
+    type: UserSchema,
+    unique: false
   },
   order_type: {
     type: String,
