@@ -16,8 +16,9 @@ app.use(express.json());
 app.use('/api/delivered', require('./routes/api/delivered'));
 app.use('/api/orders', require('./routes/api/orders'));
 app.use('/support/report', require('./routes/support/report'));
+app.use('/api/auth', require('./routes/api/auth'));
+app.use('/api/users', require('./routes/users'));
 
 app.listen(PORT, () => {
-  process.stdout.write('\033c');
   console.log(`~ Server running on port ${PORT}`);
 });
