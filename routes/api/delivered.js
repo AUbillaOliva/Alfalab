@@ -1,27 +1,37 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
+const httpError = require('http-errors');
 const OrdersSchema = require('../../modules/Orders');
 const mongoose = require('mongoose');
-
 const Delivered = mongoose.model('delivered', OrdersSchema);
+const auth = require('../../middleware/auth');
 
+/**
+@route   GET api/delivered
+@desc    Return list of delivered orders
+@access  Public
+*/
 router.get('/', async (req, res) => {
   try {
     const data = await Delivered.find().populate('data');
-    if(!data){
-      res.status(404).send({
-        msg: 'There is not orders'
-      })
+    if(!data) {
+      res.status(200).send({ msg: 'There is not orders' });
     } else {
-      res.send(data);
+      res.status(200).send(data);
     }
-  } catch(err){
-    process.stdout.write('\033c');
-    console.error(err);
+  } catch(error){
+    console.error(error.message);
+    res.status(500).send(httpError.InternalServerError('Server error'));
   }
 });
 
+/**
+@route   POST api/delivered
+@desc    Saves/update order in db
+@param   number
+@access  Private
+*/
 router.post('/:number?', 
 [
   [
@@ -31,9 +41,9 @@ router.post('/:number?',
     check('created_at').not().isEmpty(),
     check('status').not().isEmpty()
   ]
-], async (req, res) => {
+], auth, async (req, res) => {
   const errors = validationResult(req);
-  if(!errors.isEmpty()){
+  if(!errors.isEmpty()) {
     return res.status(400).json({errors: errors.array()});
   }
 
@@ -61,9 +71,9 @@ router.post('/:number?',
   if(status != null || status != undefined) { deliveryFields.status = status; }
   
   try {
-    let delivery = await Delivered.findOne({orders_number: req.params.number});
+    let delivery = await Delivered.findOne({ orders_number: req.params.number });
     if(delivery) {
-      delivery = await Delivered.findOneAndUpdate({orders_number: req.params.number},{
+      delivery = await Delivered.findOneAndUpdate({orders_number: req.params.number}, {
         $set: deliveryFields,
         new: false
       });
@@ -73,29 +83,33 @@ router.post('/:number?',
       delivery = new Delivered(deliveryFields);
       await delivery.save();
       console.log(`Delivery ${delivery._id} created`);
-      res.send(delivery).status(200);
+      res.status(200).send(delivery);
     }
-  } catch(err){
-    console.error(err);
-    res.status(500).send('server error');
+  } catch(error){
+    console.error(error.message);
+    res.status(500).send(httpError.InternalServerError('Server error'));
   }
 });
 
-router.delete('/:number', async (req, res) => {
+/**
+@route   DELETE api/delivered
+@desc    delete delivery
+@param   number
+@access  Private
+*/
+router.delete('/:number', auth, async (req, res) => {
   try {
     let delivery = await Delivered.findOne({ orders_number: req.params.number });
-    if(delivery){
+    if(delivery) {
       await Delivered.findByIdAndRemove(delivery._id);
       console.log(`Delivery ${delivery._id} deleted`);
-      res.send(`Delivery ${delivery._id} deleted`).status(200);
+      res.status(200).send(`Delivery ${delivery._id} deleted`);
     } else {
-      res.send('Delivery not found').status(404);
-      console.log('Delivery not found');
+      res.status(404).send(httpError.NotFound('Delivery not found'));
     }
-  } catch (err) {
-    process.stdout.write('\033c');
-    console.error(err);
-    res.send('Server Error').status(500);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send(httpError.InternalServerError('Server error'));
   }
 });
 

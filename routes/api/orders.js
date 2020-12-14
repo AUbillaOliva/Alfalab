@@ -1,54 +1,56 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
+const httpError = require('http-errors');
 const OrdersSchema = require('../../modules/Orders');
 const mongoose = require('mongoose');
 const autoincrement = require('mongoose-auto-increment');
-
+const auth = require('../../middleware/auth');
 OrdersSchema.plugin(autoincrement.plugin, { model: 'orders', field: 'orders_number', startAt: 0, incrementBy: 1 });
 const Orders = mongoose.model('orders', OrdersSchema);
 
+/**
+@route   GET api/orders
+@desc    Return orders from db
+@access  Public
+*/
 router.get('/', async (req, res) => {
   try {
     const data = await Orders.find().populate('data');
-    if(!data){
-      res.status(404).send({
-        msg: 'There is not orders'
-      })
+    if(!data) {
+      res.status(200).json({ msg: 'There is not orders' });
     } else {
-      res.send(data);
+      res.status(200).send(data);
     }
-  } catch(err){
-    process.stdout.write('\033c');
-    console.error(err);
+  } catch(error) {
+    console.error(error.message);
+    res.status(500).send(httpError.InternalServerError('Server error'));
   }
 });
 
+/**
+@route   POST api/orders
+@desc    Create/Update order
+@param   number
+@access  Private
+*/
 router.post('/:number?', 
   [
     [
-<<<<<<< HEAD
       check('orderList').not().isEmpty(),
-=======
-      check('orders').not().isEmpty(),
->>>>>>> a2b29922c1794b6ae2528347ae9745d733f3db4a
       check('client.firstname').not().isEmpty(),
       check('client.lastname').not().isEmpty(),
       check('created_at').not().isEmpty(),
       check('status').not().isEmpty()
     ]
-  ], async (req, res) => {
+  ], auth, async (req, res) => {
     const errors = validationResult(req);
-    if(!errors.isEmpty()){
-      return res.status(400).json({errors: errors.array()});
+    if(!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
     const {
-<<<<<<< HEAD
       orderList,
-=======
-      orders,
->>>>>>> a2b29922c1794b6ae2528347ae9745d733f3db4a
       client,
       zone,
       delivered_by,
@@ -59,11 +61,7 @@ router.post('/:number?',
     } = req.body;
 
     const ordersFields = {};    
-<<<<<<< HEAD
     if(orderList) { ordersFields.orderList = orderList; }
-=======
-    if(orders) { ordersFields.orders = orders; }
->>>>>>> a2b29922c1794b6ae2528347ae9745d733f3db4a
     if(client) { ordersFields.client = client; }
     if(zone) { ordersFields.zone = zone; }
     if(delivered_by) { ordersFields.delivered_by = delivered_by; }
@@ -73,51 +71,44 @@ router.post('/:number?',
     if(status != null || status != undefined) { ordersFields.status = status; }
     
     try {
-<<<<<<< HEAD
-      let orders = await Orders.findOne({orders_number: req.params.number});
+      let orders = await Orders.findOne({ orders_number: req.params.number });
       if(orders) {
-        orders = await Orders.findOneAndUpdate({orders_number: req.params.number},{
-=======
-      let order = await Orders.findOne({orders_number: req.params.number});
-      if(order) {
-        order = await Orders.findOneAndUpdate({
->>>>>>> a2b29922c1794b6ae2528347ae9745d733f3db4a
+        orders = await Orders.findOneAndUpdate({ orders_number: req.params.number }, {
           $set: ordersFields,
           new: false
         });
-        console.log(`Orders ${order._id} updated`);
-        res.send(order).status(200);
+        console.log(`Orders ${orders._id} updated`);
+        res.status(200).send(orders);
       } else {
-<<<<<<< HEAD
         orders = new Orders(ordersFields);
         await orders.save();
-        res.send(orders).status(200);
-=======
-        order = new Orders(ordersFields);
-        await order.save();
-        console.log(`Orders ${order._id} created`);
-        res.send(order).status(200);
->>>>>>> a2b29922c1794b6ae2528347ae9745d733f3db4a
+        res.status(200).send(orders);
       }
-    } catch(err){
-      console.error(err);
-      res.status(500).send('server error');
+    } catch(error){
+      console.error(error.message);
+      res.status(500).send(httpError.InternalServerError('Server error'));
     }
 });
 
-router.delete('/:number', async (req, res) => {
+/**
+@route   DELETE api/orders
+@desc    Delete order
+@param   number
+@access  Private
+*/
+router.delete('/:number', auth, async (req, res) => {
   try {
     let orders = await Orders.findOne({ orders_number: req.params.number });
-    if(orders){
+    if(orders) {
       await Orders.findByIdAndRemove(orders._id);
       console.log(`Orders ${orders._id} deleted`);
-      res.send(`Orders ${orders._id} deleted`).status(200);
+      res.status(200).send(`Orders ${orders._id} deleted`);
     } else {
-      res.send('Orders not found').status(404);
+      res.status(404).send(httpError.NotFound('Order not found'));
     }
-  } catch (err) {
-    process.stdout.write('\033c');
-    console.error(err);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send(httpError.InternalServerError('Server error'));
   }
 });
 
