@@ -22,6 +22,7 @@ router.post("/", upload.single("file"), (req, res) => {
       }
     });
   };
+  // TODO: USE .env VARS
   let transport = nodemailer.createTransport({
     host: "smtp.mailtrap.io",
     port: 2525,
@@ -69,7 +70,6 @@ router.post("/", upload.single("file"), (req, res) => {
   }
   transport.sendMail(message, (err, info) => {
     if (err) {
-      process.stdout.write('\033c');
       res.status(552);
       res.sendStatus(res.statusCode);
     } else {
@@ -79,9 +79,9 @@ router.post("/", upload.single("file"), (req, res) => {
         fs.stat(dir, function(err, stats) {
           if (!err) deleteFilesRecursive(dir);
         });
-      } catch (e) {
-        process.stdout.write('\033c');
-        console.log("Error: " + e);
+      } catch (error) {
+        console.error(error.message);
+        res.send(500).send(httpError.InternalServerError('Server error'));
       }
     }
   });
