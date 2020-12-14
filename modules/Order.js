@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
+const UserSchema = require('./User');
 
 const OrderSchema = new mongoose.Schema({
   responsible: {
-    type: String,
-    lowercase: true,
-    required: true
+    type: UserSchema
   },
   order_type: {
     type: String,
