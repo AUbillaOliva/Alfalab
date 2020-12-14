@@ -74,6 +74,7 @@ router.post('/:number?',
       let orders = await Orders.findOne({ orders_number: req.params.number });
       if(orders) {
         orders = await Orders.findOneAndUpdate({ orders_number: req.params.number }, {
+
           $set: ordersFields,
           new: false
         });
