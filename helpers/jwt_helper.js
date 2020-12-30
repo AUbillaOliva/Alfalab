@@ -4,9 +4,9 @@ const httpError = require("http-errors");
 module.exports = {
   signAccessToken: (userId) => {
     return new Promise((resolve, reject) => {
-      const payload = { user: { userId } };
+      const payload = { user: { id: userId } };
       const secret = process.env.AUTH_TOKEN_SECRET;
-      const options = { expiresIn: "1h" };
+      const options = { expiresIn: "1m" };
       jwt.sign(payload, secret, options, (err, token) => {
         if (err) {
           console.error(err.message);
