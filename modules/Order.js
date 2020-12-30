@@ -1,40 +1,39 @@
-const mongoose = require('mongoose');
-const UserSchema = require('./User');
+const mongoose = require("mongoose");
+const UserSchema = require("./User");
 
 const OrderSchema = new mongoose.Schema({
   responsible: {
     type: UserSchema,
-    unique: false
   },
   order_type: {
     type: String,
     lowercase: true,
-    required: true
+    required: true,
   },
   commentaries: {
     type: String,
-    lowercase: true
+    lowercase: true,
   },
   checkin: {
     type: String,
-    lowercase: true
+    lowercase: true,
   },
   checkout: {
     type: String,
-    lowercase: true
+    lowercase: true,
   },
   status: {
-    type: Boolean
+    type: Boolean,
   },
   digitized: {
-    type: Boolean
+    type: Boolean,
   },
   price: {
-    type: Number
+    type: Number,
   },
   level: {
-    type: Number
-  }
+    type: Number,
+  },
 });
 
 module.exports = OrderSchema;
